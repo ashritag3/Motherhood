@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Motherhood</title>
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" link href="/static/css/style.css">
+</head>
+<body>
+     <div class="login">
+         <h1><img width=75" height="75" src="/static/ivf.png" style="vertical-align: bottom;"/>&nbsp;&nbsp;<span id="motherhood">MOTHERHOOD</span></h1>
+         <p> Aid healthcare professionals in helping women undergoing the IVF process to select the highest quality embryo for transfer.</p>
+         <br>
+        <h3>Predict Embryo Quality</h3>
+		<input id="image-selector" type="file">
+		<button id="predict-button" class="btn btn-primary btn-block btn-large">Predict</button>
+		<p><span id="result"></span></p>
+		<p><span id="probability"></span></p>
+		<img id="selected-image" width="300" src=""/>
+ </div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    let base64Image;
+    $("#image-selector").change(function() {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let dataURL = reader.result;
+            $('#selected-image').attr("src", dataURL);
+            base64Image = dataURL.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+            console.log(base64Image);
+        }
+        reader.readAsDataURL($("#image-selector")[0].files[0]);
+        $("#prediction").text("");
+        $("#result").text("");
+        $("#probability").text("");
+
+    });
+
+    $("#predict-button").click(function(){
+            let message = {
+            image: base64Image
+        }
+        console.log(message);
+        $.post("http://127.0.0.1:5000/make_prediction", JSON.stringify(message), function(response){
+            $("#result").text("PREDICTION: " + response.prediction.result);
+            $("#probability").text("PROBABILITY: " + response.prediction.accuracy.toFixed(2));
+            console.log(response);
+        });
+    });
+
+</script>
+
+</html>
